@@ -1,6 +1,9 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useContext } from "react";
 import parkingsData from "../data/parkings.json";
 import { Link } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import Header from "./Header";
+
 
 const districts = [
   "Районы",
@@ -33,8 +36,9 @@ function Home() {
   const [district, setDistrict] = useState("Районы");
   const [type, setType] = useState("Типы");
   const [visibleCount, setVisibleCount] = useState(10);
+  const { isAuthenticated, logout } = useAuth();
 
-  // Фильтрация парковок
+
   const filteredParkings = useMemo(() => {
     return parkingsData.filter((p) => {
       const matchesDistrict =
@@ -51,7 +55,6 @@ function Home() {
 
   return (
     <div>
-      {/* Хедер и баннер */}
       <div
         style={{
           marginLeft: "20%",
@@ -98,6 +101,7 @@ function Home() {
           >
             Мобильді қосымша GPS-пен біріктіріліп, тұрақ орындарын жылдам әрі оңай табуға мүмкіндік береді және бәсекеге қабілетті бағаларды ұсынады.
           </p>
+          
           <button
             style={{
               background: "#2563eb",
@@ -109,7 +113,8 @@ function Home() {
               border: "none",
               cursor: "pointer",
               boxShadow: "0 2px 8px rgba(37,99,235,0.12)",
-              transition: "background 0.2s"
+              transition: "background 0.2s",
+              marginTop: "16px" 
             }}
           >
             Жүктеу
@@ -118,9 +123,7 @@ function Home() {
       </div>
 
       {/* Картинка */}
-      <div style={{
-        marginLeft: "10%"
-      }}>
+      <div style={{ marginLeft: "10%" }}>
         <img
           src="/public/Screenshot 2025-07-24 123810.png"
           alt="Скриншот"
@@ -148,7 +151,7 @@ function Home() {
           type="text"
           placeholder="Іздеу..."
           value={search}
-          onChange={e => setSearch(e.target.value)}
+          onChange={(e) => setSearch(e.target.value)}
         />
       </div>
 
@@ -190,7 +193,6 @@ function Home() {
               {cat}
             </span>
           ))}
-          
           <span
             onClick={() => setType("Типы")}
             style={{
@@ -242,9 +244,9 @@ function Home() {
             cursor: "pointer"
           }}
           value={district}
-          onChange={e => setDistrict(e.target.value)}
+          onChange={(e) => setDistrict(e.target.value)}
         >
-          {districts.map(d => (
+          {districts.map((d) => (
             <option key={d} value={d}>
               {d}
             </option>
@@ -269,47 +271,36 @@ function Home() {
           </div>
         )}
         {visibleParkings.map((p, idx) => (
-  <Link
-    to={`/parking/${p.id}`}
-    key={p.id}
-    style={{ textDecoration: "none", width: "90%", maxWidth: "700px" }}
-  >
-    <div
-      style={{
-        border: "1.5px solid #bdbdbd",
-        borderRadius: "6px",
-        padding: "18px 24px",
-        background: "#fff",
-        cursor: "pointer"
-      }}
-    >
-      <div style={{
-        color: "#2563eb",
-        fontWeight: 600,
-        fontSize: "1.2rem",
-        marginBottom: "8px"
-      }}>
-        {p.name}
-      </div>
-      <div style={{
-        display: "flex",
-        alignItems: "center",
-        gap: "8px",
-        color: "#f59e42",
-        fontSize: "1.1rem"
-      }}>
-        <span>📍</span>
-        <span style={{ color: "#222", fontSize: "1rem" }}>{p.address}</span>
-      </div>
-      <div style={{ marginTop: "6px", color: "#222" }}>
-        <div>Телефон <span style={{ marginLeft: 8 }}>{p.phone}</span></div>
-        <div>Часы работы <span style={{ marginLeft: 8 }}>{p.hours}</span></div>
-        <div>Район <span style={{ marginLeft: 8 }}>{p.district}</span></div>
-        <div>Тип <span style={{ marginLeft: 8 }}>{p.type}</span></div>
-      </div>
-    </div>
-  </Link>
-))}
+          <Link
+            to={`/parking/${p.id}`}
+            key={p.id}
+            style={{ textDecoration: "none", width: "90%", maxWidth: "700px" }}
+          >
+            <div
+              style={{
+                border: "1.5px solid #bdbdbd",
+                borderRadius: "6px",
+                padding: "18px 24px",
+                background: "#fff",
+                cursor: "pointer"
+              }}
+            >
+              <div style={{ color: "#2563eb", fontWeight: 600, fontSize: "1.2rem", marginBottom: "8px" }}>
+                {p.name}
+              </div>
+              <div style={{ display: "flex", alignItems: "center", gap: "8px", color: "#f59e42", fontSize: "1.1rem" }}>
+                <span>📍</span>
+                <span style={{ color: "#222", fontSize: "1rem" }}>{p.address}</span>
+              </div>
+              <div style={{ marginTop: "6px", color: "#222" }}>
+                <div>Телефон <span style={{ marginLeft: 8 }}>{p.phone}</span></div>
+                <div>Часы работы <span style={{ marginLeft: 8 }}>{p.hours}</span></div>
+                <div>Район <span style={{ marginLeft: 8 }}>{p.district}</span></div>
+                <div>Тип <span style={{ marginLeft: 8 }}>{p.type}</span></div>
+              </div>
+            </div>
+          </Link>
+        ))}
         {filteredParkings.length > visibleCount && (
           <button
             style={{

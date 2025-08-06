@@ -1,37 +1,23 @@
 const jwt = require('jsonwebtoken');
-const { JWT_SECRET } = require('../config/env');
-const rateLimit = require('express-rate-limit');
+require('dotenv').config();
+
+const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret';
 
 const authMiddleware = (req, res, next) => {
-    const token = req.headers.authorization?.split(' ')[1];
-    if (!token) return res.status(401).json({ message: 'No token provided' });
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({ message: 'Токен отсутствует или неверный формат' });
+  }
 
-    try {
-        const decoded = jwt.verify(token, JWT_SECRET);
-        req.user = decoded;
-        next();
-    }catch (error) {
-        res.sendStatus(403).json({ message: 'Invalid token' });
-    }
+  const token = authHeader.split(' ')[1];
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET);
+    req.user = decoded;
+    next();
+  } catch (err) {
+    console.error('Invalid token:', err.message);
+    return res.status(401).json({ message: 'Недействительный токен' });
+  }
 };
 
-
-
-const errorHandler = (err, req, res, next) => {
-    console.error(err.stack);
-    res.status(500).send({ message: 'Something went wrong!' });
-};
-
-const Limiter = rateLimit({
-    windowMs: 1 * 60 * 1000, // 1 minute
-    max: 5, // Limit each IP to 5 requests per windowMs
-    message: 'Too many requests, please try again later.',
-    statusCode: 429,
-});
-
-
-module.exports = {
-    authMiddleware,
-    errorHandler,
-    Limiter
-};
+module.exports = { authMiddleware };
